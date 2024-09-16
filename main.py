@@ -2,7 +2,7 @@ from fastapi import Depends, FastAPI, status
 from sqlalchemy.orm import Session
 
 from auth import cruds, models, schemas
-from utils.database import SessionLocal, engine
+from core.database import SessionLocal, engine
 from utils.app_response import successResponse, failedResponse
 
 models.Base.metadata.create_all(bind=engine)
