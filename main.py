@@ -1,22 +1,13 @@
 from fastapi import Depends, FastAPI, status
 from sqlalchemy.orm import Session
 
-from auth import cruds, models, schemas
-from core.database import SessionLocal, engine
+from app.auth import cruds, models, schemas
+from core.database import engine, get_db
 from utils.app_response import successResponse, failedResponse
 
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
-
-
-# Dependency
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 @app.post("/users/", response_model=schemas.User)
 def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
