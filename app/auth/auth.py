@@ -1,0 +1,21 @@
+from fastapi import Depends, APIRouter, status
+from sqlalchemy.orm import Session
+
+from app.auth import cruds, models, schemas
+from core.database import engine, get_db
+from utils.app_response import successResponse, failedResponse
+
+models.Base.metadata.create_all(bind=engine)
+
+auth_router = APIRouter()
+
+
+@auth_router.post("/users/", response_model=schemas.User)
+def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
+    db_user = cruds.get_user_by_email(db, email=user.email)
+    if db_user:
+        return failedResponse(status_code=status.HTTP_302_FOUND,message="User already registered")
+    
+    new_user = cruds.create_user(db=db, user=user)
+    return successResponse(status_code=status.HTTP_201_CREATED, message="User created successfully", data=new_user)
+    
