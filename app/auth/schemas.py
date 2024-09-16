@@ -11,10 +11,9 @@ class UserCreate(UserBase):
 
 class User(UserBase):
     id: int
-    email: str
-    full_name: str | None = None
 
     class Config:
-        orm_mode = True
+        # orm_mode = True
+        from_attributes = True
 
         
