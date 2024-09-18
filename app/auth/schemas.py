@@ -13,7 +13,13 @@ class User(UserBase):
     id: int
 
     class Config:
-        # orm_mode = True
-        from_attributes = True
+        orm_mode = True
+        # from_attributes = True
 
         
+# for send otp
+class TakeEmail(BaseModel):
+    email: str
+
+    # class Config:
+    #     orm_mode = True

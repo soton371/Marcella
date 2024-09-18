@@ -11,3 +11,4 @@ class Users(Base):
     full_name = Column(String, nullable=True)
     password = Column(String)
 
+
