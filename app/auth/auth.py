@@ -18,17 +18,18 @@ auth_router = APIRouter()
 @auth_router.post("/send-otp")
 def sendOtp(getEmail: schemas.TakeEmail, db: Session = Depends(get_db)):
     try:
+        cruds.delete_otp_by_email(db=db, email=getEmail.email)
         myOtp = otp_manager.generateOTP()
-        sendOtp = otp_manager.sendOtpSmtp(otp=myOtp, recipientMail=getEmail.email)
 
-        if not sendOtp:
-            return failedResponse(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,message="Failed to send otp")
-        
         otpStore = cruds.otp_store(db=db, otp_code=myOtp, recipient_mail=getEmail.email)
         if not otpStore:
             return failedResponse(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,message="Failed to store otp")
 
-        return successResponse(status_code=status.HTTP_201_CREATED, message="Otp code send successfully")
+        sendOtp = otp_manager.sendOtpSmtp(otp=myOtp, recipientMail=getEmail.email)
+        if not sendOtp:
+            return failedResponse(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,message="Failed to send otp")
+
+        return successResponse(status_code=status.HTTP_201_CREATED, message="Otp code sent successfully")
     except Exception as e:
         print(f"sendOtp e:{e}")
         return failedResponse(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,message="Something went wrong")
