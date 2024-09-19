@@ -32,7 +32,6 @@ def otp_store(db: Session, otp_code: str, recipient_mail: str):
 def delete_otp_by_email(db: Session, email: str):
     try:
         otpStore = db.query(models.OtpStore).filter(models.OtpStore.email == email).all()
-        print(f'otp store: {otpStore}')
         for i in otpStore:
             db.delete(i)
             db.commit()
