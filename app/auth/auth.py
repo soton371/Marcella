@@ -6,9 +6,8 @@ from core.database import engine, get_db
 from utils.app_response import successResponse, failedResponse
 
 # for send otp
-from email.message import EmailMessage
-import smtplib
-import random
+from utils import otp_manager
+
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -17,27 +16,21 @@ auth_router = APIRouter()
 
 # for send otp
 @auth_router.post("/send-otp")
-def sendOtp(getEmail: schemas.TakeEmail):
+def sendOtp(getEmail: schemas.TakeEmail, db: Session = Depends(get_db)):
     try:
-        generateOtp = ''
-        for i in range(5):
-            generateOtp += str(random.randint(0,9))
+        myOtp = otp_manager.generateOTP()
+        sendOtp = otp_manager.sendOtpSmtp(otp=myOtp, recipientMail=getEmail.email)
 
-        smtpServer = smtplib.SMTP('smtp.gmail.com', 587)
-        smtpServer.starttls()
-        smtpServer.login('tasmia437@gmail.com', 'ceeb akto jmmq ivfk')
+        if not sendOtp:
+            return failedResponse(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,message="Failed to send otp")
+        
+        otpStore = cruds.otp_store(db=db, otp_code=myOtp, recipient_mail=getEmail.email)
+        if not otpStore:
+            return failedResponse(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,message="Failed to store otp")
 
-        msg = EmailMessage()
-        msg['Subject'] = 'Otp Verification'
-        msg['from'] = 'tasmia437@gmail.com'
-        msg['to'] = getEmail.email
-        msg.set_content(f"Your otp code is: {generateOtp}")
-
-        smtpServer.send_message(msg)
-
-        return successResponse(status_code=status.HTTP_201_CREATED, message="User created successfully")
+        return successResponse(status_code=status.HTTP_201_CREATED, message="Otp code send successfully")
     except Exception as e:
-        print(f"{e}")
+        print(f"sendOtp e:{e}")
         return failedResponse(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,message="Something went wrong")
 
 

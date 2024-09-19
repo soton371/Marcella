@@ -20,6 +20,3 @@ class User(UserBase):
 # for send otp
 class TakeEmail(BaseModel):
     email: str
-
-    # class Config:
-    #     orm_mode = True

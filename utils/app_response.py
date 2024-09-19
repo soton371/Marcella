@@ -1,7 +1,7 @@
 from fastapi.responses import JSONResponse
 from typing import Any, Optional
 
-def successResponse(status_code: int, message: str, data: Optional[Any] = None):
+def successResponse(status_code: int, message: str, data: Any | None = None):
     return JSONResponse(status_code= status_code, content={
             "success": True,
             "message": message,
