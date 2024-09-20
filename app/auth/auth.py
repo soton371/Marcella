@@ -6,7 +6,7 @@ from core.database import engine, get_db
 from utils.app_response import successResponse, failedResponse
 
 # for send otp
-from utils import otp_manager
+from utils import otp_manager, datetime_manager
 
 
 models.Base.metadata.create_all(bind=engine)
@@ -35,6 +35,20 @@ def sendOtp(getEmail: schemas.TakeEmail, db: Session = Depends(get_db)):
         return failedResponse(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,message="Something went wrong")
 
 
+# for match otp
+@auth_router.post("/match-otp")
+def matchOtp(payload: schemas.MatchOtpPayload, db: Session = Depends(get_db)):
+    try:
+        otpStore = cruds.get_otp(db=db, email= payload.email)
+        if not otpStore:
+            return failedResponse(status_code=status.HTTP_404_NOT_FOUND,message="Your otp code not found")
+        
+        sendTime = datetime_manager.string_to_datetime(otpStore.send_time)
+        
+
+    except Exception as e:
+        print(f"matchOtp e: {e}")
+        return failedResponse(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,message="Something went wrong")
 
 
 @auth_router.post("/users/", response_model=schemas.User)

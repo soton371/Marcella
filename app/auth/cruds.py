@@ -37,3 +37,13 @@ def delete_otp_by_email(db: Session, email: str):
             db.commit()
     except Exception as e:
         print(f"delete_otp_by_email e: {e}")
+
+
+def get_otp(db: Session, email: str):
+    try:
+        return db.query(models.OtpStore).filter(models.OtpStore.email == email).first()
+    except Exception as e:
+        print(f'get_otp')
+        return None
+    
+    

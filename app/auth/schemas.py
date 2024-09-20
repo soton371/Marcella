@@ -14,9 +14,13 @@ class User(UserBase):
 
     class Config:
         orm_mode = True
-        # from_attributes = True
 
         
 # for send otp
 class TakeEmail(BaseModel):
     email: str
+
+# for match otp
+class MatchOtpPayload(BaseModel):
+    email: str
+    otp_code: str
