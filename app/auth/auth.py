@@ -29,7 +29,7 @@ def sendOtp(getEmail: schemas.TakeEmail, db: Session = Depends(get_db)):
         if not sendOtp:
             return failedResponse(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,message="Failed to send otp")
 
-        return successResponse(status_code=status.HTTP_201_CREATED, message="Otp code sent successfully")
+        return successResponse(status_code=status.HTTP_200_OK, message="Otp code sent successfully")
     except Exception as e:
         print(f"sendOtp e:{e}")
         return failedResponse(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,message="Something went wrong")
@@ -46,7 +46,10 @@ def matchOtp(payload: schemas.MatchOtpPayload, db: Session = Depends(get_db)):
         if datetime_manager.is_expired(otpStore.send_time):
             return failedResponse(status_code=status.HTTP_400_BAD_REQUEST,message="Your OTP code has expired")
         
-
+        if not payload.otp_code == otpStore.otp:
+            return failedResponse(status_code=status.HTTP_404_NOT_FOUND,message="Your otp code does not match")
+        cruds.delete_otp_by_email(db=db, email=payload.email)
+        return successResponse(status_code=status.HTTP_200_OK, message="Your otp code matches")
     except Exception as e:
         print(f"matchOtp e: {e}")
         return failedResponse(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,message="Something went wrong")
