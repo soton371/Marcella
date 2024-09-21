@@ -1,13 +1,17 @@
-from fastapi import Depends, APIRouter, status
+from typing import Annotated, Optional
+from fastapi import Depends, APIRouter, status, Header
+from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 
 from app.auth import cruds, models, schemas
 from core.database import engine, get_db
-from utils.app_response import successResponse, failedResponse
+from utils.app_response import successResponse, failedResponse, unauthorizedResponse
 from utils import token_manager
 
 # for send otp
 from utils import otp_manager, datetime_manager
+
+from utils.token_manager import extract_token, verify_token
 
 
 models.Base.metadata.create_all(bind=engine)
@@ -16,7 +20,7 @@ auth_router = APIRouter()
 
 
 # for send otp
-@auth_router.post("/send-otp")
+@auth_router.post("/api/v1/send-otp")
 def sendOtp(getEmail: schemas.TakeEmail, db: Session = Depends(get_db)):
     try:
         cruds.delete_otp_by_email(db=db, email=getEmail.email)
@@ -37,7 +41,7 @@ def sendOtp(getEmail: schemas.TakeEmail, db: Session = Depends(get_db)):
 
 
 # for match otp
-@auth_router.post("/match-otp")
+@auth_router.post("/api/v1/match-otp")
 def matchOtp(payload: schemas.MatchOtpPayload, db: Session = Depends(get_db)):
     try:
         otpStore = cruds.get_otp(db=db, email= payload.email)
@@ -57,9 +61,15 @@ def matchOtp(payload: schemas.MatchOtpPayload, db: Session = Depends(get_db)):
         return failedResponse(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,message="Something went wrong")
 
 
-@auth_router.post("/users/", response_model=schemas.User)
+@auth_router.post("/api/v1/register")
 def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
     try:
+        # print(f'Authorization: {token}')
+        # extractToken = extract_token(authorization=authorization)
+        # verify = verify_token(token=extractToken)
+        # if verify is None:
+        #     return unauthorizedResponse()
+
         db_user = cruds.get_user_by_email(db, email=user.email)
         if db_user:
             return failedResponse(status_code=status.HTTP_302_FOUND,message="User already registered")

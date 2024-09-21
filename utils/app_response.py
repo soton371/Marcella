@@ -1,5 +1,6 @@
 from fastapi.responses import JSONResponse
-from typing import Any, Optional
+from typing import Any
+from fastapi import status
 
 def successResponse(status_code: int, message: str, data: Any | None = None, token: str | None = None):
     response_content = {
@@ -21,4 +22,8 @@ def failedResponse(status_code: int, message: str):
             "message": message
         })
 
-# create schemas for response
+def unauthorizedResponse():
+    return JSONResponse(status_code= status.HTTP_401_UNAUTHORIZED, content={
+            "success": False,
+            "message": 'Unauthorized request'
+        })
