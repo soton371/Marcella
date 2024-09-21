@@ -65,9 +65,7 @@ def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
             return failedResponse(status_code=status.HTTP_302_FOUND,message="User already registered")
         
         new_user = cruds.create_user(db=db, user=user)
-        user_data = schemas.User.model_validate(new_user)
-        print(f"register new_user: {new_user.__dict__}")
-        return successResponse(status_code=status.HTTP_201_CREATED, message="User created successfully", data=user_data)
+        return successResponse(status_code=status.HTTP_201_CREATED, message="User created successfully", data=new_user.to_dict())
     except Exception as e:
         print(f"register e: {e}")
         return failedResponse(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,message="Something went wrong")

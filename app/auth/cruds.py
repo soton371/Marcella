@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 from app.auth import schemas, models
 from datetime import datetime
+from utils.hash_manager import get_password_hash
 
 
 
@@ -9,8 +10,8 @@ def get_user_by_email(db: Session, email: str):
     return db.query(models.Users).filter(models.Users.email == email).first()
 
 def create_user(db: Session, user: schemas.UserCreate):
-    fake_hashed_password = user.password + "notreallyhashed"
-    db_user = models.Users(email=user.email, full_name = user.full_name, password=fake_hashed_password)
+    hashed_password = get_password_hash(user.password)
+    db_user = models.Users(email=user.email, full_name = user.full_name, password=hashed_password)
     db.add(db_user)
     db.commit()
     db.refresh(db_user)

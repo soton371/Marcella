@@ -11,6 +11,9 @@ class Users(Base):
     full_name = Column(String, nullable=True)
     password = Column(String)
 
+    def to_dict(self):
+        return {column.name: getattr(self, column.name) for column in self.__table__.columns if column.name != "password"}
+
 
 class OtpStore(Base):
     __tablename__ = "otp_store"
