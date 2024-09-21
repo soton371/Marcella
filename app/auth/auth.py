@@ -49,7 +49,7 @@ def matchOtp(payload: schemas.MatchOtpPayload, db: Session = Depends(get_db)):
         if not payload.otp_code == otpStore.otp:
             return failedResponse(status_code=status.HTTP_404_NOT_FOUND,message="Your otp code does not match")
         cruds.delete_otp_by_email(db=db, email=payload.email)
-        return successResponse(status_code=status.HTTP_200_OK, message="Your otp code matches")
+        return successResponse(status_code=status.HTTP_200_OK, message="Your otp code matches", token= 'jwt token for match otp')
     except Exception as e:
         print(f"matchOtp e: {e}")
         return failedResponse(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,message="Something went wrong")

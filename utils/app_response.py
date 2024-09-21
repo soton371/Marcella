@@ -1,12 +1,19 @@
 from fastapi.responses import JSONResponse
 from typing import Any, Optional
 
-def successResponse(status_code: int, message: str, data: Any | None):
-    return JSONResponse(status_code= status_code, content={
-            "success": True,
-            "message": message,
-            "data": data
-        })
+def successResponse(status_code: int, message: str, data: Any | None = None, token: str | None = None):
+    response_content = {
+        "success": True,
+        "message": message
+    }
+    
+    if data is not None:
+        response_content["data"] = data
+
+    if token is not None:
+        response_content["token"] = token
+
+    return JSONResponse(status_code=status_code, content=response_content)
 
 def failedResponse(status_code: int, message: str):
     return JSONResponse(status_code= status_code, content={
