@@ -24,3 +24,9 @@ class TakeEmail(BaseModel):
 class MatchOtpPayload(BaseModel):
     email: str
     otp_code: str
+
+
+# for token
+class Token(BaseModel):
+    access_token: str
+    token_type: str

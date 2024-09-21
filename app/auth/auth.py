@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from app.auth import cruds, models, schemas
 from core.database import engine, get_db
 from utils.app_response import successResponse, failedResponse
+from utils import token_manager
 
 # for send otp
 from utils import otp_manager, datetime_manager
@@ -49,7 +50,8 @@ def matchOtp(payload: schemas.MatchOtpPayload, db: Session = Depends(get_db)):
         if not payload.otp_code == otpStore.otp:
             return failedResponse(status_code=status.HTTP_404_NOT_FOUND,message="Your otp code does not match")
         cruds.delete_otp_by_email(db=db, email=payload.email)
-        return successResponse(status_code=status.HTTP_200_OK, message="Your otp code matches", token= 'jwt token for match otp')
+        matchOtpToken = token_manager.create_match_otp_token(otpStore.to_dict())
+        return successResponse(status_code=status.HTTP_200_OK, message="Your otp code matches", token= matchOtpToken)
     except Exception as e:
         print(f"matchOtp e: {e}")
         return failedResponse(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,message="Something went wrong")

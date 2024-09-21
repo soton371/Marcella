@@ -19,3 +19,6 @@ class OtpStore(Base):
     email = Column(String, nullable=True)
     otp = Column(String, nullable=True)
     send_time = Column(String, nullable=True)
+
+    def to_dict(self):
+        return {column.name: getattr(self, column.name) for column in self.__table__.columns}
