@@ -1,9 +1,13 @@
-from datetime import datetime
+from datetime import datetime, timedelta    
 
-
-def string_to_datetime(date_string: str) -> (datetime | None):
+def is_expired(stored_datetime_str: str) -> bool:
     try:
-        format = "%Y-%m-%d %H:%M:%S.%f"  # Format to match your string
-        return datetime.strptime(date_string, format)
+        format = "%Y-%m-%d %H:%M:%S.%f"
+        stored_datetime = datetime.strptime(stored_datetime_str, format)
+        
+        expiration_time = stored_datetime + timedelta(minutes=3)
+        
+        return datetime.now() > expiration_time
     except Exception as e:
-        return None
+        print(f'is_expired e : {e}')
+        return False

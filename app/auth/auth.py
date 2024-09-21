@@ -43,7 +43,8 @@ def matchOtp(payload: schemas.MatchOtpPayload, db: Session = Depends(get_db)):
         if not otpStore:
             return failedResponse(status_code=status.HTTP_404_NOT_FOUND,message="Your otp code not found")
         
-        sendTime = datetime_manager.string_to_datetime(otpStore.send_time)
+        if datetime_manager.is_expired(otpStore.send_time):
+            return failedResponse(status_code=status.HTTP_400_BAD_REQUEST,message="Your OTP code has expired")
         
 
     except Exception as e:
